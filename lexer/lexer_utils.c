@@ -3,14 +3,15 @@
 /*                                                        :::      ::::::::   */
 /*   lexer_utils.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: marvin <marvin@student.42.fr>              +#+  +:+       +#+        */
+/*   By: abmusleh <abmusleh@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/12/20 20:27:36 by abmusleh          #+#    #+#             */
-/*   Updated: 2026/02/04 00:46:40 by marvin           ###   ########.fr       */
+/*   Created: 2026/02/04 19:21:53 by abmusleh          #+#    #+#             */
+/*   Updated: 2026/02/05 00:20:27 by abmusleh         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
+#include "lexer.h"
 
 t_token *token_list_new(t_token_type type, char *value)
 {
@@ -42,21 +43,6 @@ void	ft_lstadd_back(t_token **list, t_token *new)
 	tmp->next = new;
 }
 
-// int	lst_size(t_list *list)
-// {
-// 	int	i;
-
-// 	i = 1;
-// 	if (!list)
-// 		return (0);
-// 	while (list->next)
-// 	{
-// 		list = list->next;
-// 		i++;
-// 	}
-// 	return (i);
-// }
-
 void	lst_clear(t_token **list)
 {
 	t_token	*tmp1;
@@ -68,11 +54,24 @@ void	lst_clear(t_token **list)
 	while (tmp1)
 	{
 		tmp2 = tmp1->next;
-		free((*tmp1)->value);
+		free(tmp1->value);
 		free(tmp1);
 		tmp1 = tmp2;
 	}
 	*list = NULL;
 }
 
+		// int	lst_size(t_list *list)
+		// {
+		// 	int	i;
 
+		// 	i = 1;
+		// 	if (!list)
+		// 		return (0);
+		// 	while (list->next)
+		// 	{
+		// 		list = list->next;
+		// 		i++;
+		// 	}
+		// 	return (i);
+		// }
