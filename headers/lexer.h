@@ -24,6 +24,7 @@ typedef enum e_token_type
     REDIR_OUT,    // >
     REDIR_APPEND, // >>
     HEREDOC       // <<
+    EOF
 }   t_token_type;
 
 typedef struct s_token
