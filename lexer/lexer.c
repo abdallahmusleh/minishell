@@ -14,6 +14,21 @@
 #include "libft/libft.h"
 #include "minishell.h"
 
+static void end_of_file_token(t_token **list)
+{
+	char	*value;
+	t_token	*token;
+
+	value = NULL;
+	token = token_list_new(EOF, value);
+	if (!token)
+	{
+		free(value);
+		lst_clear(token_list);
+		return ;
+	}
+	ft_lstadd_back(&token_list, token);
+}
 static int	handle_operator(t_token **token_list, char *line, int *i)
 {
 	if (line[*i] == '<')
@@ -61,6 +76,7 @@ t_token	*lexing(char *line)
 				return (NULL);
 		}
 	}
+	end_of_file_token(&token_list);
 	return (token_list);
 }
 //ask about end of file token/ error token
