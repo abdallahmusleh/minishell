@@ -14,20 +14,17 @@
 #include "libft/libft.h"
 #include "minishell.h"
 
-static void end_of_file_token(t_token **list)
+static void end_of_file_token(t_token **token_list)
 {
-	char	*value;
 	t_token	*token;
 
-	value = NULL;
-	token = token_list_new(EOF, value);
+	token = token_list_new(T_EOF, NULL);
 	if (!token)
 	{
-		free(value);
 		lst_clear(token_list);
 		return ;
 	}
-	ft_lstadd_back(&token_list, token);
+	ft_lstadd_back(token_list, token);
 }
 static int	handle_operator(t_token **token_list, char *line, int *i)
 {
