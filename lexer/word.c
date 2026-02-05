@@ -97,11 +97,11 @@ t_token *word_parser(char *line, int *i)
     word = substr_and_quotes_remover(line, start, i);
     if (!word)
         return (NULL);
-    if (!*word)//check if we send empty word instead of NULL
-    {
-        free(word);
-        return (NULL);
-    }
+    // if (!*word)//check if we send empty word instead of NULL
+    // {
+    //     free(word);
+    //     return (NULL);
+    // }
     token = token_list_new(WORD, word);
     if (!token)
     {
