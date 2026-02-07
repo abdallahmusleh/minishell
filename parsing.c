@@ -131,10 +131,9 @@ t_pipeline  *parse(t_token *tokens)
     t_pipeline  *pipeline;
     int num_commands;
 
-      // Validate FIRST, before any allocation
     if (!syntax_validator(tokens))
     {
-        // print error message here or in validate_syntax
+        write(2, "error: invalid syntax", 22);//could write in syntax validator file
         return (NULL);
     }
     num_commands = command_counter(tokens);
