@@ -130,7 +130,13 @@ t_pipeline  *parse(t_token *tokens)
 {
     t_pipeline  *pipeline;
     int num_commands;
-    
+
+      // Validate FIRST, before any allocation
+    if (!syntax_validator(tokens))
+    {
+        // print error message here or in validate_syntax
+        return (NULL);
+    }
     num_commands = command_counter(tokens);
     pipeline = initialize_pipeline(num_commands);
     if (!pipeline)
