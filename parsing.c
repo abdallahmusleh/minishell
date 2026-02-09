@@ -6,7 +6,7 @@
 /*   By: abmusleh <abmusleh@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/06 18:33:08 by abmusleh          #+#    #+#             */
-/*   Updated: 2026/02/09 20:40:08 by abmusleh         ###   ########.fr       */
+/*   Updated: 2026/02/09 20:57:12 by abmusleh         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -194,7 +194,8 @@ t_pipeline  *parse(t_token *tokens)
     t_pipeline  *pipeline;
     int num_commands;
 
-    if (!syntax_validator(tokens))
+    if (syntax_validator(tokens) == 57 || syntax_validator(tokens) == 40 
+        || syntax_validator(tokens) == 46)
         return (NULL);
     num_commands = command_counter(tokens);
     pipeline = initialize_pipeline(num_commands);
