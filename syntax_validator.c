@@ -1,3 +1,16 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   syntax_validator.c                                 :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: abmusleh <abmusleh@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/02/09 16:38:17 by abmusleh          #+#    #+#             */
+/*   Updated: 2026/02/09 16:40:29 by abmusleh         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
+#include "headers/lexer.h"
 #include "headers/minishell.h"
 #include "libft/libft.h"
 
@@ -15,7 +28,7 @@ static int pipe_validator(t_token *tokens)
             if (tmp_tokens->next && tmp_tokens->next->type == T_EOF)
                 return(0);
             if (tmp_tokens->next && tmp_tokens->next->type == PIPE)
-                return(0);
+                return(2);
         }
         tmp_tokens = tmp_tokens->next;
     }
@@ -46,8 +59,10 @@ int syntax_validator(t_token *tokens)
     if (!tokens || tokens->type == T_EOF)
         return (1);
     if (!pipe_validator(tokens))
-        return (0);
+        return (write(2, "minishell: syntax error near unexpected token `newline'\n", 57));
+    if (pipe_validator == 2)
+        return(write(2, "syntax error near unexpected token `|'\n", 40));
     if (!redirections_validator(tokens))
-        return (0);
+        return (write(2, "syntax error near unexpected token `newline'\n", 46));
     return (1);
 }
