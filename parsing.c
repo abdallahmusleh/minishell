@@ -6,7 +6,7 @@
 /*   By: abmusleh <abmusleh@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/06 18:33:08 by abmusleh          #+#    #+#             */
-/*   Updated: 2026/02/06 23:25:30 by abmusleh         ###   ########.fr       */
+/*   Updated: 2026/02/09 20:40:08 by abmusleh         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,7 @@
 // if (tmp_tokens->type == REDIR_IN || tmp_tokens->type == REDIR_OUT 
 //         || tmp_tokens->type == REDIR_APPEND || tmp_tokens->type == HEREDOC)
 //         tmp_tokens = tmp_tokens->next;
+
 static int command_counter(t_token *tokens)
 {
     int i;
@@ -60,17 +61,78 @@ static t_pipeline *initialize_pipeline(int num_commands)
     }
     return (pipeline);
 }
-void parse_redir(t_pipeline *pipeline, t_token *tmp_tokens, int i)
+
+static int  parse_redir_in(t_pipeline *pipeline, t_token **token, int i)
 {
-    if (tmp_tokens->type == REDIR_IN)
-        parse_redir_in();
-    if (tmp_tokens->type == REDIR_OUT)
-        parse_redir_out();
-    if (tmp_tokens->type == REDIR_APPEND)
-        parse_redir_append();
-    if (tmp_tokens->type == HEREDOC)
-        parse_heredoc();
+    int fd;
+
+    if (pipeline->commands[i].input_fd != STDIN_FILENO)
+        close(pipeline->commands[i].input_fd);
+    fd = open((*token)->next->value, O_RDONLY);
+    if (!fd)
+    {
+        write(2, "invalid fd", 11);
+        return(0);    
+    }
+    pipeline->commands[i].input_fd = fd;
+    *token = (*token)->next;
+    return(1);
 }
+
+static int  parse_redir_out(t_pipeline *pipeline, t_token **token, int i)
+{
+    int fd;
+
+    if (pipeline->commands[i].output_fd != STDOUT_FILENO)
+        close(pipeline->commands[i].output_fd);
+    fd = open((*token)->next->value, O_WRONLY | O_CREAT | O_TRUNC, 0644);
+    if (fd == -1)
+    {
+        write(2, "invalid fd", 11);
+        return(0);    
+    }
+    pipeline->commands[i].output_fd = fd;
+    *token = (*token)->next;
+    return(1);
+}
+
+static int  parse_redir_append(t_pipeline *pipeline, t_token **token, int i)
+{
+    int fd;
+
+    if (pipeline->commands[i].output_fd != STDOUT_FILENO)
+        close(pipeline->commands[i].output_fd);
+    fd = open((*token)->next->value, O_WRONLY | O_CREAT | O_APPEND, 0644);
+    if (fd == -1)
+    {
+        write(2, "invalid fd", 11);
+        return(0);    
+    }
+    pipeline->commands[i].output_fd = fd;
+    *token = (*token)->next;
+    return(1);
+}
+
+static int parse_heredoc(t_pipeline *pipeline, t_token **tokens, int i)
+{
+    // Heredoc implementation (more complex, typically involves creating a temp file or pipe)
+    
+    // TODO: Implement heredoc logic
+    *tokens = (*tokens)->next;
+}
+
+void parse_redir(t_pipeline *pipeline, t_token **tmp_tokens, int i)
+{
+    if ((*tmp_tokens)->type == REDIR_IN)
+        parse_redir_in(pipeline, tmp_tokens, i);
+    if ((*tmp_tokens)->type == REDIR_OUT)
+        parse_redir_out(pipeline, tmp_tokens, i);
+    if ((*tmp_tokens)->type == REDIR_APPEND)
+        parse_redir_append(pipeline, tmp_tokens, i);
+    if ((*tmp_tokens)->type == HEREDOC)
+        parse_heredoc(pipeline, tmp_tokens, i);
+}
+
 static void fill_command(t_pipeline **pipeline, t_token *tokens, int count_words, int i)
 {
     int j;
@@ -85,7 +147,7 @@ static void fill_command(t_pipeline **pipeline, t_token *tokens, int count_words
     {
         if (tmp_tokens->type == REDIR_IN || tmp_tokens->type == REDIR_OUT 
                 || tmp_tokens->type == REDIR_APPEND || tmp_tokens->type == HEREDOC)
-            parse_redir(pipeline, tmp_tokens, i);
+            parse_redir(pipeline, &tmp_tokens, i);
         else if (tmp_tokens->type == WORD)
         {
             (*pipeline)->commands[i].args[j] = ft_strdup(tmp_tokens->value);
@@ -126,16 +188,14 @@ static void fill_command_helper(t_pipeline **pipeline, t_token *tokens)
             tmp_tokens = tmp_tokens->next;
     }
 }
+
 t_pipeline  *parse(t_token *tokens)
 {
     t_pipeline  *pipeline;
     int num_commands;
 
     if (!syntax_validator(tokens))
-    {
-        write(2, "error: invalid syntax", 22);//could write in syntax validator file
         return (NULL);
-    }
     num_commands = command_counter(tokens);
     pipeline = initialize_pipeline(num_commands);
     if (!pipeline)
