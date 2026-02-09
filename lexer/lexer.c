@@ -6,7 +6,7 @@
 /*   By: abmusleh <abmusleh@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/02 21:29:09 by abmusleh          #+#    #+#             */
-/*   Updated: 2026/02/05 00:19:11 by abmusleh         ###   ########.fr       */
+/*   Updated: 2026/02/06 18:20:07 by abmusleh         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,6 +26,7 @@ static void end_of_file_token(t_token **token_list)
 	}
 	ft_lstadd_back(token_list, token);
 }
+
 static int	handle_operator(t_token **token_list, char *line, int *i)
 {
 	if (line[*i] == '<')
@@ -36,6 +37,7 @@ static int	handle_operator(t_token **token_list, char *line, int *i)
         return( handle_pipe(token_list, i));
 	return (1);
 }
+
 static int	handle_word(t_token **token_list, int *i, char *line)
 {
 	t_token	*token;
@@ -49,6 +51,7 @@ static int	handle_word(t_token **token_list, int *i, char *line)
 	ft_lstadd_back(token_list, token);
 	return (1);
 }
+
 t_token	*lexing(char *line)
 {
 	t_token	*token_list;
@@ -76,4 +79,3 @@ t_token	*lexing(char *line)
 	end_of_file_token(&token_list);
 	return (token_list);
 }
-//ask about end of file token/ error token
