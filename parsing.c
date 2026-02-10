@@ -199,8 +199,7 @@ t_pipeline  *parse(t_token *tokens)
     t_pipeline  *pipeline;
     int num_commands;
 
-    if (syntax_validator(tokens) == 57 || syntax_validator(tokens) == 40 
-        || syntax_validator(tokens) == 46)
+    if (!syntax_validator(tokens))
         return (NULL);
     num_commands = command_counter(tokens);
     pipeline = initialize_pipeline(num_commands);
