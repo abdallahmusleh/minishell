@@ -19,6 +19,38 @@
 // if (tmp_tokens->type == REDIR_IN || tmp_tokens->type == REDIR_OUT 
 //         || tmp_tokens->type == REDIR_APPEND || tmp_tokens->type == HEREDOC)
 //         tmp_tokens = tmp_tokens->next;
+void free_pipeline (t_pipeline *pipeline)
+{
+    int i;
+    int j;
+    
+    if (!pipeline)
+        return;
+    i = 0;
+    if (pipeline->commands)
+    {
+        while (i < pipeline->num_commands)
+        {
+            if (pipeline->commands[i].args)
+            {
+                j = 0;
+                while (pipeline->commands[i].args[j])
+                {
+                    free(pipeline->commands[i].args[j]);
+                    j++;
+                }
+                free(pipeline->commands[i].args);
+            }
+            if (pipeline->commands[i].input_fd != STDIN_FILENO)
+                close(pipeline->commands[i].input_fd);
+            if (pipeline->commands[i].output_fd != STDOUT_FILENO)
+                close(pipeline->commands[i].output_fd);
+            i++;
+        }
+        free(pipeline->commands);
+    }
+    free(pipeline);
+}
 
 static int command_counter(t_token *tokens)
 {
@@ -135,7 +167,7 @@ static int parse_redir(t_pipeline *pipeline, t_token **tmp_tokens, int i)
     return(1);
 }
 
-static void fill_command(t_pipeline **pipeline, t_token *tokens, int count_words, int i)
+static int fill_command_helper(t_pipeline **pipeline, t_token *tokens, int count_words, int i)
 {
     int j;
     t_token *tmp_tokens;
@@ -144,28 +176,29 @@ static void fill_command(t_pipeline **pipeline, t_token *tokens, int count_words
     tmp_tokens = tokens;
     (*pipeline)->commands[i].args = malloc(sizeof(char *) * (count_words + 1));
     if (!(*pipeline)->commands[i].args)
-            return ;
+            return (0);
     while (j < count_words && tmp_tokens && tmp_tokens->type != T_EOF && tmp_tokens->type != PIPE)
     {
         if (tmp_tokens->type == REDIR_IN || tmp_tokens->type == REDIR_OUT 
                 || tmp_tokens->type == REDIR_APPEND || tmp_tokens->type == HEREDOC)
         {
             if (!parse_redir(pipeline, &tmp_tokens, i))
-                return ;
+                return (0);
         }
         else if (tmp_tokens->type == WORD)
         {
             (*pipeline)->commands[i].args[j] = ft_strdup(tmp_tokens->value);
             if (!(*pipeline)->commands[i].args[j])
-                return;
+                return (0);
             j++;
         }
         tmp_tokens = tmp_tokens->next;
     }
     (*pipeline)->commands[i].args[j] = NULL;
+    return(1);
 }
 
-static void fill_command_helper(t_pipeline **pipeline, t_token *tokens)
+static int fill_command(t_pipeline **pipeline, t_token *tokens)
 {
     int count_words;
     t_token *tmp_tokens;
@@ -187,11 +220,13 @@ static void fill_command_helper(t_pipeline **pipeline, t_token *tokens)
                 count_words++;
             tmp_tokens = tmp_tokens->next;
         }
-        fill_command(pipeline, cmd_start, count_words, i);
+        if(!fill_command_helper(pipeline, cmd_start, count_words, i))
+            return (0);
         i++;
         if (tmp_tokens && tmp_tokens->type == PIPE)//is this necessary or can we just go to next
             tmp_tokens = tmp_tokens->next;
     }
+    return(1);
 }
 
 t_pipeline  *parse(t_token *tokens)
@@ -205,6 +240,10 @@ t_pipeline  *parse(t_token *tokens)
     pipeline = initialize_pipeline(num_commands);
     if (!pipeline)
         return (NULL);
-    fill_command_helper(&pipeline, tokens);
+    if(!fill_command(&pipeline, tokens))
+    {
+        free_pipeline(pipeline);
+        return (NULL);
+    }
     return (pipeline);
 }
