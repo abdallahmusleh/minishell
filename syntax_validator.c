@@ -59,11 +59,21 @@ int syntax_validator(t_token *tokens)
     if (!tokens || tokens->type == T_EOF)
         return (1);
     if (!pipe_validator(tokens))
-        return (write(2, "minishell: syntax error near unexpected token `newline'\n", 57));
+    {
+        write(2, "minishell: syntax error near unexpected token `newline'\n", 57);
+        return (0);
+    }
     if (pipe_validator(tokens) == 2)
-        return(write(2, "syntax error near unexpected token `|'\n", 40));
+    {
+        write(2, "syntax error near unexpected token `|'\n", 40);
+        return(0);
+    }
     if (!redirections_validator(tokens))
-        return (write(2, "syntax error near unexpected token `newline'\n", 46));
+    {
+        write(2, "syntax error near unexpected token `newline'\n", 46);
+        return (0);
+    }
     return (1);
 }
+
 
