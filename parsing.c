@@ -69,7 +69,7 @@ static int  parse_redir_in(t_pipeline *pipeline, t_token **token, int i)
     if (pipeline->commands[i].input_fd != STDIN_FILENO)
         close(pipeline->commands[i].input_fd);
     fd = open((*token)->next->value, O_RDONLY);
-    if (!fd)
+    if (fd == -1)
     {
         write(2, "invalid fd", 11);
         return(0);    
