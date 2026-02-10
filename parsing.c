@@ -106,6 +106,7 @@ static int  parse_redir_append(t_pipeline *pipeline, t_token **token, int i)
     if (fd == -1)
     {
         write(2, "invalid fd", 11);
+        //check actual error msg
         return(0);    
     }
     pipeline->commands[i].output_fd = fd;
@@ -121,16 +122,17 @@ static int parse_heredoc(t_pipeline *pipeline, t_token **tokens, int i)
     *tokens = (*tokens)->next;
 }
 
-void parse_redir(t_pipeline *pipeline, t_token **tmp_tokens, int i)
+static int parse_redir(t_pipeline *pipeline, t_token **tmp_tokens, int i)
 {
     if ((*tmp_tokens)->type == REDIR_IN)
-        parse_redir_in(pipeline, tmp_tokens, i);
-    if ((*tmp_tokens)->type == REDIR_OUT)
-        parse_redir_out(pipeline, tmp_tokens, i);
-    if ((*tmp_tokens)->type == REDIR_APPEND)
-        parse_redir_append(pipeline, tmp_tokens, i);
-    if ((*tmp_tokens)->type == HEREDOC)
-        parse_heredoc(pipeline, tmp_tokens, i);
+        return(parse_redir_in(pipeline, tmp_tokens, i));
+    else if ((*tmp_tokens)->type == REDIR_OUT)
+        return(parse_redir_out(pipeline, tmp_tokens, i));
+    else if ((*tmp_tokens)->type == REDIR_APPEND)
+       return(parse_redir_append(pipeline, tmp_tokens, i));
+    else if ((*tmp_tokens)->type == HEREDOC)
+        return(parse_heredoc(pipeline, tmp_tokens, i));
+    return(1);
 }
 
 static void fill_command(t_pipeline **pipeline, t_token *tokens, int count_words, int i)
@@ -147,7 +149,10 @@ static void fill_command(t_pipeline **pipeline, t_token *tokens, int count_words
     {
         if (tmp_tokens->type == REDIR_IN || tmp_tokens->type == REDIR_OUT 
                 || tmp_tokens->type == REDIR_APPEND || tmp_tokens->type == HEREDOC)
-            parse_redir(pipeline, &tmp_tokens, i);
+        {
+            if (!parse_redir(pipeline, &tmp_tokens, i))
+                return ;
+        }
         else if (tmp_tokens->type == WORD)
         {
             (*pipeline)->commands[i].args[j] = ft_strdup(tmp_tokens->value);
