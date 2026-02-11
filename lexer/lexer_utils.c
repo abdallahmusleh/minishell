@@ -11,7 +11,7 @@
 /* ************************************************************************** */
 
 #include "minishell.h"
-#include "lexer.h"
+#include "headers/lexer.h"
 
 t_token *token_list_new(t_token_type type, char *value)
 {
