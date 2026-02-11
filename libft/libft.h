@@ -6,7 +6,7 @@
 /*   By: abmusleh <abmusleh@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/14 20:16:45 by abmusleh          #+#    #+#             */
-/*   Updated: 2025/08/19 21:05:14 by abmusleh         ###   ########.fr       */
+/*   Updated: 2026/02/11 21:00:39 by abmusleh         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,4 +51,5 @@ char	*ft_strtrim(char const *s1, char const *set);
 char	*ft_substr(char const *s, unsigned int start, size_t len);
 int		ft_tolower(int c);
 int		ft_toupper(int c);
+int     ft_strcmp(char *s1, char *s2);
 #endif
