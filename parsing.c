@@ -6,7 +6,7 @@
 /*   By: abmusleh <abmusleh@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/06 18:33:08 by abmusleh          #+#    #+#             */
-/*   Updated: 2026/02/11 15:59:38 by abmusleh         ###   ########.fr       */
+/*   Updated: 2026/02/11 20:59:24 by abmusleh         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,12 +56,12 @@ static int fill_command_helper(t_pipeline **pipeline, t_token *tokens, int count
     (*pipeline)->commands[i].args = malloc(sizeof(char *) * (count_words + 1));
     if (!(*pipeline)->commands[i].args)
             return (0);
-    while (j < count_words && tmp_tokens && tmp_tokens->type != T_EOF && tmp_tokens->type != PIPE)
+    while (j < count_words && tmp_tokens && tmp_tokens->type != T_EOF && tmp_tokens->type != PIPE)//check this out
     {
         if (tmp_tokens->type == REDIR_IN || tmp_tokens->type == REDIR_OUT 
                 || tmp_tokens->type == REDIR_APPEND || tmp_tokens->type == HEREDOC)
         {
-            if (!parse_redir(pipeline, &tmp_tokens, i))
+            if (!parse_redir(*pipeline, &tmp_tokens, i))
                 return (0);
         }
         else if (tmp_tokens->type == WORD)
@@ -108,7 +108,7 @@ static int fill_command(t_pipeline **pipeline, t_token *tokens)
     return(1);
 }
 
-t_pipeline  *parse(t_token *tokens)
+t_pipeline  *parse_pipeline(t_token *tokens)
 {
     t_pipeline  *pipeline;
     int num_commands;
