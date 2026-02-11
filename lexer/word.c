@@ -6,7 +6,7 @@
 /*   By: abmusleh <abmusleh@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/05 00:01:27 by abmusleh          #+#    #+#             */
-/*   Updated: 2026/02/05 00:03:46 by abmusleh         ###   ########.fr       */
+/*   Updated: 2026/02/06 18:20:48 by abmusleh         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,7 +75,7 @@ static int	find_end_of_word(char *line, int *i)
                 (*i)++;
             if (!line[*i])
             {
-                write(2, "syntax error: unclosed quote\n", 30);
+                write(2, "syntax error: unclosed quote\n", 29);
                 return (0);
             }
             (*i)++;
