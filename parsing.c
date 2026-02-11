@@ -6,7 +6,7 @@
 /*   By: abmusleh <abmusleh@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/06 18:33:08 by abmusleh          #+#    #+#             */
-/*   Updated: 2026/02/09 20:57:12 by abmusleh         ###   ########.fr       */
+/*   Updated: 2026/02/11 15:59:38 by abmusleh         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,54 +19,6 @@
 // if (tmp_tokens->type == REDIR_IN || tmp_tokens->type == REDIR_OUT 
 //         || tmp_tokens->type == REDIR_APPEND || tmp_tokens->type == HEREDOC)
 //         tmp_tokens = tmp_tokens->next;
-void free_pipeline (t_pipeline *pipeline)
-{
-    int i;
-    int j;
-    
-    if (!pipeline)
-        return;
-    i = 0;
-    if (pipeline->commands)
-    {
-        while (i < pipeline->num_commands)
-        {
-            if (pipeline->commands[i].args)
-            {
-                j = 0;
-                while (pipeline->commands[i].args[j])
-                {
-                    free(pipeline->commands[i].args[j]);
-                    j++;
-                }
-                free(pipeline->commands[i].args);
-            }
-            if (pipeline->commands[i].input_fd != STDIN_FILENO)
-                close(pipeline->commands[i].input_fd);
-            if (pipeline->commands[i].output_fd != STDOUT_FILENO)
-                close(pipeline->commands[i].output_fd);
-            i++;
-        }
-        free(pipeline->commands);
-    }
-    free(pipeline);
-}
-
-static int command_counter(t_token *tokens)
-{
-    int i;
-    
-    if (!tokens)
-        return (0);
-    i = 1;
-    while (tokens && tokens->type != T_EOF)
-    {
-        if (tokens->type == PIPE)
-            i++;
-        tokens = tokens->next;
-    }
-    return(i);
-}
 
 static t_pipeline *initialize_pipeline(int num_commands)
 {
@@ -92,79 +44,6 @@ static t_pipeline *initialize_pipeline(int num_commands)
         i++;
     }
     return (pipeline);
-}
-
-static int  parse_redir_in(t_pipeline *pipeline, t_token **token, int i)
-{
-    int fd;
-
-    if (pipeline->commands[i].input_fd != STDIN_FILENO)
-        close(pipeline->commands[i].input_fd);
-    fd = open((*token)->next->value, O_RDONLY);
-    if (fd == -1)
-    {
-        write(2, "invalid fd", 11);
-        return(0);    
-    }
-    pipeline->commands[i].input_fd = fd;
-    *token = (*token)->next;
-    return(1);
-}
-
-static int  parse_redir_out(t_pipeline *pipeline, t_token **token, int i)
-{
-    int fd;
-
-    if (pipeline->commands[i].output_fd != STDOUT_FILENO)
-        close(pipeline->commands[i].output_fd);
-    fd = open((*token)->next->value, O_WRONLY | O_CREAT | O_TRUNC, 0644);
-    if (fd == -1)
-    {
-        write(2, "invalid fd", 11);
-        return(0);    
-    }
-    pipeline->commands[i].output_fd = fd;
-    *token = (*token)->next;
-    return(1);
-}
-
-static int  parse_redir_append(t_pipeline *pipeline, t_token **token, int i)
-{
-    int fd;
-
-    if (pipeline->commands[i].output_fd != STDOUT_FILENO)
-        close(pipeline->commands[i].output_fd);
-    fd = open((*token)->next->value, O_WRONLY | O_CREAT | O_APPEND, 0644);
-    if (fd == -1)
-    {
-        write(2, "invalid fd", 11);
-        //check actual error msg
-        return(0);    
-    }
-    pipeline->commands[i].output_fd = fd;
-    *token = (*token)->next;
-    return(1);
-}
-
-static int parse_heredoc(t_pipeline *pipeline, t_token **tokens, int i)
-{
-    // Heredoc implementation (more complex, typically involves creating a temp file or pipe)
-    
-    // TODO: Implement heredoc logic
-    *tokens = (*tokens)->next;
-}
-
-static int parse_redir(t_pipeline *pipeline, t_token **tmp_tokens, int i)
-{
-    if ((*tmp_tokens)->type == REDIR_IN)
-        return(parse_redir_in(pipeline, tmp_tokens, i));
-    else if ((*tmp_tokens)->type == REDIR_OUT)
-        return(parse_redir_out(pipeline, tmp_tokens, i));
-    else if ((*tmp_tokens)->type == REDIR_APPEND)
-       return(parse_redir_append(pipeline, tmp_tokens, i));
-    else if ((*tmp_tokens)->type == HEREDOC)
-        return(parse_heredoc(pipeline, tmp_tokens, i));
-    return(1);
 }
 
 static int fill_command_helper(t_pipeline **pipeline, t_token *tokens, int count_words, int i)
