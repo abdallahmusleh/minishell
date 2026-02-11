@@ -6,7 +6,7 @@
 /*   By: abmusleh <abmusleh@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/09 16:38:17 by abmusleh          #+#    #+#             */
-/*   Updated: 2026/02/09 16:40:29 by abmusleh         ###   ########.fr       */
+/*   Updated: 2026/02/11 20:35:36 by abmusleh         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,5 +75,3 @@ int syntax_validator(t_token *tokens)
     }
     return (1);
 }
-
-
