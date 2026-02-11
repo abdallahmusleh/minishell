@@ -6,7 +6,7 @@
 /*   By: abmusleh <abmusleh@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/11 15:59:52 by abmusleh          #+#    #+#             */
-/*   Updated: 2026/02/11 17:04:19 by abmusleh         ###   ########.fr       */
+/*   Updated: 2026/02/11 19:16:19 by abmusleh         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,8 +62,20 @@ int command_counter(t_token *tokens)
     return(i);
 }
 
-void    close_fds(int fd[])
+void    parse_heredoc_helper(int fd[2], char *str)
 {
-	close(fd[0]);
-	close(fd[1]);
+    write(2,
+		"warning: here-document delimited by end-of-file (wanted `",
+		57);
+    if (str)
+        write(2, str, ft_strlen(str));
+	write(2, "')\n", 3);
+}
+
+void    free_and_close(char *str, int fd)
+{
+    if (str)
+        free(str);
+    if (fd >= 0)
+        close(fd);
 }
