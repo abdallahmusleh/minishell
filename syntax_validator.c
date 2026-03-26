@@ -6,7 +6,7 @@
 /*   By: abmusleh <abmusleh@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/09 16:38:17 by abmusleh          #+#    #+#             */
-/*   Updated: 2026/02/11 20:35:36 by abmusleh         ###   ########.fr       */
+/*   Updated: 2026/03/26 16:04:10 by abmusleh         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,14 +56,17 @@ static int redirections_validator(t_token *tokens)
 
 int syntax_validator(t_token *tokens)
 {
+	int	pipe_status;
+
     if (!tokens || tokens->type == T_EOF)
         return (1);
-    if (!pipe_validator(tokens))
+    pipe_status = pipe_validator(tokens);
+    if (pipe_status == 0)
     {
         write(2, "minishell: syntax error near unexpected token `newline'\n", 57);
         return (0);
     }
-    if (pipe_validator(tokens) == 2)
+    if (pipe_status == 2)
     {
         write(2, "syntax error near unexpected token `|'\n", 40);
         return(0);
